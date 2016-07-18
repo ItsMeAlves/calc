@@ -1,3 +1,5 @@
+module Expression(Expression(..), evaluate, generate) where
+
 import Data.Char
 
 data Operation = Add | Subtract | Multiply | Divide deriving (Show, Eq)
@@ -28,14 +30,14 @@ insertInto (Node o l r) item
     | hasEmpty r = Node o l (insertInto r item)
     | otherwise = (Node o l r)
 
-eval :: Expression -> Int
-eval (Value x) = x
-eval (Node Add x y) = eval x + eval y
-eval (Node Subtract x y) = eval x - eval y
-eval (Node Multiply x y) = eval x * eval y
--- eval (Node Divide x y) = eval x / eval y
-eval _ = error "Invalid expression"
+evaluate :: Expression -> Int
+evaluate (Value x) = x
+evaluate (Node Add x y) = evaluate x + evaluate y
+evaluate (Node Subtract x y) = evaluate x - evaluate y
+evaluate (Node Multiply x y) = evaluate x * evaluate y
+-- evaluate (Node Divide x y) = evaluate x / evaluate y
+evaluate Empty = error "This is an incomplete expression"
+evaluate _ = error "Invalid expression"
 
--- main = do
---     let expression = foldl (\acc e -> insertInto acc e) Empty $ plant "***2222"
---     print $ eval expression
+generate :: String -> Expression
+generate s = foldl (\acc e -> insertInto acc e) Empty $ plant s
