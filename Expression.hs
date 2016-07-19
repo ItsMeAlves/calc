@@ -35,9 +35,8 @@ evaluate (Value x) = x
 evaluate (Node Add x y) = evaluate x + evaluate y
 evaluate (Node Subtract x y) = evaluate x - evaluate y
 evaluate (Node Multiply x y) = evaluate x * evaluate y
--- evaluate (Node Divide x y) = evaluate x / evaluate y
+evaluate (Node Divide x y) = evaluate x `quot` evaluate y
 evaluate Empty = error "This is an incomplete expression"
-evaluate _ = error "Invalid expression"
 
 generate :: String -> Expression
 generate s = foldl (\acc e -> insertInto acc e) Empty $ plant s
