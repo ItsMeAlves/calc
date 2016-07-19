@@ -1,4 +1,4 @@
--- module Expression(Expression(..), evaluate, fromPrefixNotation) where
+module Calculate.Expression(Expression(..), evaluate, fromPrefixNotation) where
 
 import Data.Char
 
