@@ -1,4 +1,4 @@
-module Calculate.Expression(Expression(..), evaluate, fromPrefixNotation) where
+module Calculate.Expression(Expression(..), evaluate, fromPrefixNotation, fromPostfixNotation) where
 
 import Data.Char
 
@@ -11,29 +11,19 @@ precedence '-' = 1
 precedence '*' = 2
 precedence '/' = 2
 
-hasFloat :: String -> Bool
-hasFloat s = not $ null $ (reads s :: [(Float,String)])
-
-extractFloat :: String -> Float
-extractFloat s = fst $ head (reads s :: [(Float,String)])
-
 plant :: [String] -> [Expression]
 plant [] = []
 plant (h:t)
     | hasFloat h = (Value $ extractFloat h):plant t
     | otherwise = (Node (toOperation $ head h) Empty Empty):plant t
-    where toOperation c
+    where hasFloat s = not $ null $ (reads s :: [(Float,String)])
+          extractFloat s = fst $ head (reads s :: [(Float,String)])
+          toOperation c
             | c == '+' = Add
             | c == '-' = Subtract
             | c == '*' = Multiply
             | c == '/' = Divide
             | otherwise = error "Unsupported operation"
-
-
-hasEmpty :: Expression -> Bool
-hasEmpty Empty = True
-hasEmpty (Value _) = False
-hasEmpty (Node _ l r) = (hasEmpty l) || (hasEmpty r)
 
 insertInto :: Expression -> Expression -> Expression
 insertInto Empty item = item
@@ -42,6 +32,9 @@ insertInto (Node o l r) item
     | hasEmpty l = Node o (insertInto l item) r
     | hasEmpty r = Node o l (insertInto r item)
     | otherwise = (Node o l r)
+    where hasEmpty Empty = True
+          hasEmpty (Value _) = False
+          hasEmpty (Node _ l r) = (hasEmpty l) || (hasEmpty r)
 
 evaluate :: Expression -> Float
 evaluate (Value x) = x
@@ -51,7 +44,27 @@ evaluate (Node Multiply x y) = evaluate x * evaluate y
 evaluate (Node Divide x y) = evaluate x / evaluate y
 evaluate Empty = error "This is an incomplete expression"
 
+generate :: [Expression] -> Expression
+generate s = foldl (\acc e -> insertInto acc e) Empty s
+
+prepareInput :: String -> [Expression]
+prepareInput s = plant $ words s
+
 fromPrefixNotation :: String -> Expression
-fromPrefixNotation s = foldl (\acc e -> insertInto acc e) Empty $ plant $ words s
+fromPrefixNotation s = generate $ prepareInput s
+
+fromPostfixNotation :: String -> Expression
+fromPostfixNotation s = generate $ toPrefix (prepareInput s) []
+    where isValue (Value _) = True
+          isValue _ = False
+          isNode (Node _ _ _) = True
+          isNode _ = False
+          toPrefix [] result = result
+          toPrefix (a:b) stack@(x:y:z)
+            | isValue a = toPrefix b (a:stack)
+            | isNode a = toPrefix b ((insertInto (insertInto a y) x):z)
+          toPrefix (a:b) stack
+            | isValue a = toPrefix b (a:stack)
+            | isNode a = error "invalid postfix expression"
 
 

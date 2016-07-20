@@ -5,4 +5,5 @@ main = do
     expression <- getLine
     putStrLn "..."
     putStrLn "This input results in:"
-    print $ evaluate $ fromPrefixNotation expression
+    print $ fromPostfixNotation expression
+    print $ evaluate $ fromPostfixNotation expression
