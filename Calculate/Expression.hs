@@ -8,6 +8,14 @@ where
 data Operation = Add | Subtract | Multiply | Divide deriving (Show, Eq)
 data Expression = Empty | Value Float | Node Operation Expression Expression deriving (Show, Eq)
 
+isValue :: Expression -> Bool
+isValue (Value _) = True
+isValue _ = False
+
+isNode :: Expression -> Bool
+isNode (Node _ _ _) = True
+isNode _ = False
+
 precedence :: Operation -> Integer
 precedence Add = 1
 precedence Subtract = 1
@@ -52,11 +60,7 @@ generate s = foldl (\acc e -> insertInto acc e) Empty s
 
 postfixBuilder :: [Expression] -> Expression
 postfixBuilder s = generate $ toPrefix s []
-    where isValue (Value _) = True
-          isValue _ = False
-          isNode (Node _ _ _) = True
-          isNode _ = False
-          toPrefix [] result = result
+    where toPrefix [] result = result
           toPrefix (a:b) stack@(x:y:z)
             | isValue a = toPrefix b (a:stack)
             | isNode a = toPrefix b ((insertInto (insertInto a y) x):z)
@@ -75,6 +79,8 @@ fromPostfixNotation s = postfixBuilder $ prepareInput s
 
 fromInfixNotation :: String -> Expression
 fromInfixNotation s = postfixBuilder $ toPostfix (prepareInput s)
-    where toPostfix t = t
+    where toPostfix [] [] result = reverse result
+          toPostfix [] (a:b) s = toPostfix [] b (a:s)
+          -- toPostfix (a:b) stack@(x:y) s
 
 
