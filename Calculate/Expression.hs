@@ -5,7 +5,7 @@ module Calculate.Expression(Expression(..),
     fromInfixNotation) 
 where
 
-data Operation = Add | Subtract | Multiply | Divide deriving (Show, Eq)
+data Operation = Add | Subtract | Multiply | Divide | Pow deriving (Show, Eq)
 data Expression = Empty | Value Float | Node Operation Expression Expression deriving (Show, Eq)
 
 isValue :: Expression -> Bool
@@ -21,6 +21,7 @@ precedence Add = 1
 precedence Subtract = 1
 precedence Multiply = 2
 precedence Divide = 2
+precedence Pow = 3
 
 insertInto :: Expression -> Expression -> Expression
 insertInto Empty item = item
@@ -45,6 +46,7 @@ plant (h:t)
             | c == '-' = Subtract
             | c == '*' = Multiply
             | c == '/' = Divide
+            | c == '^' = Pow
             | otherwise = error "Unsupported operation"
 
 evaluate :: Expression -> Float
@@ -53,6 +55,7 @@ evaluate (Node Add x y) = evaluate x + evaluate y
 evaluate (Node Subtract x y) = evaluate x - evaluate y
 evaluate (Node Multiply x y) = evaluate x * evaluate y
 evaluate (Node Divide x y) = evaluate x / evaluate y
+evaluate (Node Pow x y) = evaluate x ** evaluate y
 evaluate Empty = error "This is an incomplete expression"
 
 generate :: [Expression] -> Expression
@@ -79,8 +82,9 @@ fromPostfixNotation s = postfixBuilder $ prepareInput s
 
 fromInfixNotation :: String -> Expression
 fromInfixNotation s = postfixBuilder $ toPostfix (prepareInput s)
-    where toPostfix [] [] result = reverse result
-          toPostfix [] (a:b) s = toPostfix [] b (a:s)
-          -- toPostfix (a:b) stack@(x:y) s
+    where toPostfix t = t
+    -- where toPostfix [] [] result = reverse result
+    --       toPostfix [] (a:b) s = toPostfix [] b (a:s)
+    --       toPostfix (a:b) stack@(x:y) s
 
 
