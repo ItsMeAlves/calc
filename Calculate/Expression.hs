@@ -39,7 +39,7 @@ plant [] = []
 plant (h:t)
     | hasFloat h = (Value $ extractFloat h):plant t
     | otherwise = (Node (toOperation $ head h) Empty Empty):plant t
-    where hasFloat s = not $ null $ (reads s :: [(Float,String)])
+    where hasFloat s = not $ null (reads s :: [(Float,String)])
           extractFloat s = fst $ head (reads s :: [(Float,String)])
           toOperation c
             | c == '+' = Add
