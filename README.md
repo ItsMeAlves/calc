@@ -15,7 +15,7 @@ runhaskell app.hs -e "* - 50 23.2 10" --prefix
 The first execution receives a expression written in a postfix notation and prints its result. The second execution calculates the same, but in a prefix notation.
 
 ## Operations supported
-It's currently implemented these operations
+Currently there are some operations implemented:
   * Sum (+)
   * Subtraction (-)
   * Product (*)
