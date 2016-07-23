@@ -1,8 +1,8 @@
 module Calculate.Expression(Expression(..), 
     evaluate, 
     fromPrefixNotation, 
-    fromPostfixNotation, 
-    fromInfixNotation) 
+    fromPostfixNotation) 
+    -- fromInfixNotation) 
 where
 
 data Operation = Add | Subtract | Multiply | Divide | Pow deriving (Show, Eq)
@@ -61,15 +61,14 @@ evaluate Empty = error "This is an incomplete expression"
 generate :: [Expression] -> Expression
 generate s = foldl (\acc e -> insertInto acc e) Empty s
 
-postfixBuilder :: [Expression] -> Expression
-postfixBuilder s = generate $ toPrefix s []
-    where toPrefix [] result = result
-          toPrefix (a:b) stack@(x:y:z)
-            | isValue a = toPrefix b (a:stack)
-            | isNode a = toPrefix b ((insertInto (insertInto a y) x):z)
-          toPrefix (a:b) stack
-            | isValue a = toPrefix b (a:stack)
-            | isNode a = error "invalid postfix expression"
+fromPostfixToPrefix :: [Expression] -> [Expression] -> [Expression]
+fromPostfixToPrefix [] result = result
+fromPostfixToPrefix (a:b) stack@(x:y:z)
+    | isValue a = fromPostfixToPrefix b (a:stack)
+    | isNode a = fromPostfixToPrefix b ((insertInto (insertInto a y) x):z)
+fromPostfixToPrefix (a:b) stack
+    | isValue a = fromPostfixToPrefix b (a:stack)
+    | isNode a = error "invalid postfix expression"
 
 prepareInput :: String -> [Expression]
 prepareInput s = plant $ words s
@@ -78,11 +77,11 @@ fromPrefixNotation :: String -> Expression
 fromPrefixNotation s = generate $ prepareInput s
 
 fromPostfixNotation :: String -> Expression
-fromPostfixNotation s = postfixBuilder $ prepareInput s
+fromPostfixNotation s = generate $ fromPostfixToPrefix (prepareInput s) []
 
-fromInfixNotation :: String -> Expression
-fromInfixNotation s = postfixBuilder $ toPostfix (prepareInput s)
-    where toPostfix t = t
+-- fromInfixNotation :: String -> Expression
+-- fromInfixNotation s = generate $ fromPostfixToPrefix (toPostfix (prepareInput s))
+--     where toPostfix t = t
     -- where toPostfix [] [] result = reverse result
     --       toPostfix [] (a:b) s = toPostfix [] b (a:s)
     --       toPostfix (a:b) stack@(x:y) s
