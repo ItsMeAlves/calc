@@ -8,6 +8,8 @@ main = hspec $ do
     let e4 = fromPostfixNotation "2 2 * 6.25 +"
     let e5 = fromInfixNotation "2 * 2 + 1"
     let e6 = fromInfixNotation "2 * 2 + 6.25"
+    let e7 = fromInfixNotation "2 * (2 + 1)"
+    let e8 = fromInfixNotation "2 * (2 + 6.25)"
     describe "Expession tree tests" $ do
         it "evaluates the right result" $ do
             shouldBe (evaluate e1) 5
@@ -16,3 +18,5 @@ main = hspec $ do
             shouldBe (evaluate e4) 10.25
             shouldBe (evaluate e5) 5
             shouldBe (evaluate e6) 10.25
+            shouldBe (evaluate e7) 6
+            shouldBe (evaluate e8) 16.5
