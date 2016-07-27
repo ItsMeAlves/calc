@@ -1,8 +1,8 @@
 module Calculate.Expression(Expression(..), 
     evaluate, 
     fromPrefixNotation, 
-    fromPostfixNotation) 
-    -- fromInfixNotation) 
+    fromPostfixNotation, 
+    fromInfixNotation) 
 where
 
 -- Define all supported operations and the Expression constructors
@@ -10,7 +10,11 @@ where
 -- Value means a float number
 -- Node means a Operation between two expressions
 data Operation = Add | Subtract | Multiply | Divide | Pow deriving (Show, Eq)
-data Expression = Empty | Value Float | Node Operation Expression Expression deriving (Show, Eq)
+data Expression = Empty | Value Float | Node {
+    operation :: Operation,
+    left :: Expression,
+    right :: Expression
+    } deriving (Show, Eq)
 
 -- Check if a given Expression is constructed by Value
 isValue :: Expression -> Bool
@@ -94,11 +98,23 @@ fromPrefixNotation s = generate $ prepareInput s
 fromPostfixNotation :: String -> Expression
 fromPostfixNotation s = generate $ fromPostfixToPrefix (prepareInput s) []
 
--- fromInfixNotation :: String -> Expression
--- fromInfixNotation s = generate $ fromPostfixToPrefix (toPostfix (prepareInput s))
---     where toPostfix t = t
-    -- where toPostfix [] [] result = reverse result
-    --       toPostfix [] (a:b) s = toPostfix [] b (a:s)
-    --       toPostfix (a:b) stack@(x:y) s
+-- Receives a string input in infix notation and returns the expression
+fromInfixNotation :: String -> Expression
+fromInfixNotation s = generate $ fromPostfixToPrefix (toPostfix (prepareInput s) [] []) []
+    where toPostfix [] [] result = reverse result
+          toPostfix [] (a:b) s = toPostfix [] b (a:s)
+          toPostfix (a:b) stack s
+            | isValue a = toPostfix b stack (a:s)
+            | isNode a = if null stack then
+                    toPostfix b (a:stack) s
+                else if precedence (operation a) > precedence (operation $ head stack) then
+                    toPostfix b (a:stack) s
+                else if precedence (operation $ head stack) > precedence (operation a) then
+                    toPostfix (a:b) (tail stack) ((head stack):s)
+                else
+                    toPostfix b (a:(tail stack)) ((head stack):s)
+
+
+
 
 

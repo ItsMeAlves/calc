@@ -29,7 +29,7 @@ optionsHandler (Commander e False True) = print $ evaluate $ fromPostfixNotation
 optionsHandler (Commander e True True) = print result 
     where result = (zip ["From prefix: ", "fromPostfixNotation"]
             [evaluate $ fromPrefixNotation e, evaluate $ fromPostfixNotation e])
-optionsHandler (_ False False) = print "Error: Tell me its notation"
+optionsHandler (Commander _ False False) = print "Error: Tell me its notation"
 
 -- Main function
 main = execParser opts >>= optionsHandler
