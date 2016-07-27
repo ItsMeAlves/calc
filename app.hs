@@ -5,7 +5,8 @@ import Options.Applicative
 data Commander = Commander {
     expression :: String,
     prefix :: Bool,
-    postfix :: Bool
+    postfix :: Bool,
+    infixFlag :: Bool
 }
 
 -- Help parsing args structures
@@ -20,16 +21,17 @@ options = Commander
             <> help "Receives a prefix notation expression and evaluates it")
     <*> switch
         (long "postfix"
-            <> help "Receives a postfix notation expression and evaluates it")
+            <> help "Receives a postfix notation expression and evaluate")
+    <*> switch
+        (long "infix"
+            <> help "Receives a infix notation expression and evaluates it")
 
 -- Handle arguments
 optionsHandler :: Commander -> IO ()
-optionsHandler (Commander e True False) = print $ evaluate $ fromPrefixNotation e
-optionsHandler (Commander e False True) = print $ evaluate $ fromPostfixNotation e
-optionsHandler (Commander e True True) = print result 
-    where result = (zip ["From prefix: ", "fromPostfixNotation"]
-            [evaluate $ fromPrefixNotation e, evaluate $ fromPostfixNotation e])
-optionsHandler (Commander _ False False) = print "Error: Tell me its notation"
+optionsHandler (Commander e True False False) = print $ evaluate $ fromPrefixNotation e
+optionsHandler (Commander e False True False) = print $ evaluate $ fromPostfixNotation e
+optionsHandler (Commander e False False True) = print $ evaluate $ fromInfixNotation e
+optionsHandler (Commander _ _ _ _) = print "Error: Tell me its notation"
 
 -- Main function
 main = execParser opts >>= optionsHandler
