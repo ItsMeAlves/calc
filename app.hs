@@ -11,7 +11,7 @@ data Commander = Commander {
 
 -- Help parsing args structures
 options :: Parser Commander
-options = Commander 
+options = Commander
     <$> strOption
         (long "expression"
             <> short 'e'
@@ -38,4 +38,3 @@ main = execParser opts >>= optionsHandler
     where opts = info (helper <*> options) (fullDesc
             <> progDesc "Calculates the result of an expression"
             <> header "Calculate - A simple CLI calculator")
-

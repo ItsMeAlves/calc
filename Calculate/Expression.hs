@@ -1,8 +1,8 @@
-module Calculate.Expression(Expression(..), 
-    evaluate, 
-    fromPrefixNotation, 
-    fromPostfixNotation, 
-    fromInfixNotation) 
+module Calculate.Expression(Expression(..),
+    evaluate,
+    fromPrefixNotation,
+    fromPostfixNotation,
+    fromInfixNotation)
 where
 
 -- Define all supported operations and the Expression constructors
@@ -46,7 +46,7 @@ insertInto (Node o l r) item
           hasEmpty (Value _) = False
           hasEmpty (Node _ l r) = (hasEmpty l) || (hasEmpty r)
 
--- Reads the string input and translates it into small expressions 
+-- Reads the string input and translates it into small expressions
 plant :: [String] -> [Expression]
 plant [] = []
 plant (h:t)
@@ -113,8 +113,3 @@ fromInfixNotation s = generate $ fromPostfixToPrefix (toPostfix (prepareInput s)
                     toPostfix (a:b) (tail stack) ((head stack):s)
                 else
                     toPostfix b (a:(tail stack)) ((head stack):s)
-
-
-
-
-
